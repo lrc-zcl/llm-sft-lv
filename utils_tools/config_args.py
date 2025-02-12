@@ -25,6 +25,6 @@ class CustomizedArguments:
 def train_arguments():
     total_parser = HfArgumentParser((CustomizedArguments, TrainingArguments))
     custom_args, train_args = total_parser.parse_json_file(
-        json_file='/home/lv/llm-demo/configs/chatglm3-6b_lora_train_configs.json')
+        json_file='/home/lv/llm-demo/configs/chatglm3-6b_qlora_train_configs.json')
     return custom_args, train_args
 

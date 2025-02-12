@@ -16,7 +16,7 @@ class SchoolMathDataset(Dataset):
         self.model_name = model_name
         self.model_path = model_path
         self.max_seq_length = max_seq_length
-        self.datasets = self.read_json_file()
+        self.datasets = self.read_json_file()[:40000]
         self.tokenizer = load_chatglm3_tokenizer(self.model_path)
         self.template = template_dict.get(self.model_name)
 
