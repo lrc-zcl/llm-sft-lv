@@ -78,7 +78,7 @@ class BatchDataCollator():
         self.tokenizer = tokenizer
         self.max_seq_length = max_seq_length
         self.pad_token_id = tokenizer.pad_token_id
-
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     def __call__(self, batch):
         batch_inputs_id = []
         batch_attention_mask = []
@@ -102,9 +102,9 @@ class BatchDataCollator():
             batch_target_mask.append(target_mask_have_pad)
 
         # 将batch 数据转成 tensor
-        batch_input_ids_tensor = torch.tensor(batch_inputs_id, dtype=torch.long)
-        batch_attention_mask_tensor = torch.tensor(batch_attention_mask, dtype=torch.long)
-        batch_target_mask_tensor = torch.tensor(batch_target_mask, dtype=torch.long)
+        batch_input_ids_tensor = torch.tensor(batch_inputs_id, dtype=torch.long).to(self.device)
+        batch_attention_mask_tensor = torch.tensor(batch_attention_mask, dtype=torch.long).to(self.device)
+        batch_target_mask_tensor = torch.tensor(batch_target_mask, dtype=torch.long).to(self.device)
         # 利用target 的数据制作labels
         batch_labels = torch.where(batch_target_mask_tensor == 1, batch_input_ids_tensor, -100)
         return {

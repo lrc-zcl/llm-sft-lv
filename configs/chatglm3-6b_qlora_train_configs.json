@@ -30,5 +30,6 @@
   "save_strategy": "steps",
   "weight_decay": 0,
   "max_grad_norm": 0.3,
-  "remove_unused_columns": false
+  "remove_unused_columns": false,
+  "dataloader_pin_memory": false
 }
