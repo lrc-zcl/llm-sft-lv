@@ -37,6 +37,9 @@ if __name__ == "__main__":
         use_rslora=False,
         loftq_config=None
     )
+    print(peft_model.device)
+    print(peft_model.device)
+    print(peft_model.device)
     dataset = load_dataset(custom_args.datasets_path, split="train")
     dataset = standardize_sharegpt(dataset=dataset)  # 处理数据集
     dataset = dataset.map(formatting_prompts_func_only, batched=True)  # 添加special tokens
