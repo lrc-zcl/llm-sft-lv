@@ -6,6 +6,21 @@ from utils_tools.load_tokenizers import load_chatglm3_tokenizer
 from torch.utils.data import DataLoader
 from loguru import logger
 
+"""
+chatglm没有固定的chat_template,需要自己自定义，具体可以根据官网的格式进行定义。
+具体可以参考如下：
+<|system|>
+You are ChatGLM3, a large language model trained by Zhipu.AI. Follow the user's instructions carefully. Respond using markdown.
+<|user|>
+Hello
+<|assistant|>
+Hello, I'm ChatGLM3. What can I assist you today?
+
+注意：
+例如：qwen2.5这种模型就用固定的chat_template,可以直接使用tokenizer.apply_chat_template()函数进行查看
+但是真实在训练qwen2.5的时候建议使用和上述chatglm3相同构建数据集的方法，因为需要inputs_id、attention_mask、target_mask,需要知道数据长度
+不过也可以参考unsloth中的方法，直接使用apply_chat_template方法构建，但是此时的数据集单条是一个list
+"""
 
 class SchoolMathDataset(Dataset):
     """
