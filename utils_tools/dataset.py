@@ -20,6 +20,57 @@ Hello, I'm ChatGLM3. What can I assist you today?
 例如：qwen2.5这种模型就用固定的chat_template,可以直接使用tokenizer.apply_chat_template()函数进行查看
 但是真实在训练qwen2.5的时候建议使用和上述chatglm3相同构建数据集的方法，因为需要inputs_id、attention_mask、target_mask,需要知道数据长度
 不过也可以参考unsloth中的方法，直接使用apply_chat_template方法构建，但是此时的数据集单条是一个list
+
+示例：仅供参考
+def __getitem__(self, index):
+    """
+    使用 tokenizer.apply_chat_template() 格式化数据
+    """
+    # 读取原始数据
+    user_input = self.datasets[index]['instruction']
+    assistant_output = self.datasets[index]['output']
+
+    # 构造对话历史
+    messages = [
+        {"role": "system", "content": self.template.system},
+        {"role": "user", "content": user_input},
+        {"role": "assistant", "content": assistant_output}
+    ]
+
+    # 使用 chat_template 编码对话
+    final_inputs_id = self.tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=False,
+        return_tensors="pt",  # 返回 PyTorch tensor，如果你想返回 list 可用 return_tensors=None
+        max_length=self.max_seq_length,
+        truncation=True,
+    )[0].tolist()  # 转换为 list[int]
+
+    # 构建目标 mask：只关注 assistant 输出部分
+    # 下面假设 assistant 输出在最后一轮，你可以根据需要精细控制 mask 范围
+    prompt_messages = messages[:-1]  # system + user
+    prompt_ids = self.tokenizer.apply_chat_template(
+        prompt_messages,
+        add_generation_prompt=True,
+        return_tensors="pt",
+    )[0].tolist()
+    target_mask_id = [0] * len(prompt_ids) + [1] * (len(final_inputs_id) - len(prompt_ids))
+
+    attention_mask_id = [1] * len(final_inputs_id)
+
+    # 截断处理
+    final_inputs_id = final_inputs_id[:self.max_seq_length]
+    target_mask_id = target_mask_id[:self.max_seq_length]
+    attention_mask_id = attention_mask_id[:self.max_seq_length]
+
+    assert len(final_inputs_id) == len(target_mask_id) == len(attention_mask_id), "返回的结果必须长度相同"
+
+    return {
+        "input_ids": final_inputs_id,
+        "target_mask": target_mask_id,
+        "attention_mask": attention_mask_id
+    }
+
 """
 
 class SchoolMathDataset(Dataset):
